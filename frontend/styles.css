@@ -1,0 +1,105 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+nav {
+    background-color: #333;
+    color: white;
+    padding: 1em;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+#main-content {
+    padding: 2em;
+}
+
+
+.portfolio-list {
+    display: relative;
+    list-style-type: none;
+    padding: 0;
+}
+.portfolio-list li {
+    margin-right: 20px;
+    cursor: pointer;
+}
+.portfolio-details {
+    display: none;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+.header {
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    font-family: 'Comic Sans MS', sans-serif;
+}
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.header-middle {
+    text-align: center;
+}
+.table thead th {
+    border-bottom: 2px solid black;
+}
+.table tbody td {
+    border-top: none;
+}
+.headertable thead th{
+    border-bottom: 0px;
+    
+
+}
+
+
+.delete-coin {
+    color: green;
+    cursor: pointer;
+}
+.delete-coin-red {
+    color: red;
+    cursor: pointer;
+}
+.delete-port {
+    text-align: right;
+    margin-top: 20px;
+}
+.delete-port button {
+    color: red;
+}
+
+
+.overlay {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    color: #fff;
+}
+
+.overlay-content {
+    background: #333;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}

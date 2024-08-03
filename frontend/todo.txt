@@ -1,0 +1,23 @@
+#home page creation hw #done
+
+#in each port
+    #performance # add button 
+    #table having coin and there indivuail properties and delete button with that
+
+#on dashboard show all coin details, maybe sort them using there performance in last 24 hrs
+
+# Testing:
+    Write unit tests for backend API endpoints
+    Implement basic frontend testing (e.g., form validation)
+# Documentation:
+    Provide clear documentation on how to set up and run the application locally
+    Include API documentation for backend endpoints
+    Document the database schema and any complex queries
+
+# SQL script to create the database schema
+    README.md file with setup instructions and any necessary documentation
+    .gitignore file to exclude unnecessary files (e.g., pycache, .env)
+
+
+
+this.textContent -> is the port name
