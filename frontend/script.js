@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const content = `
                 <h2>Sign Up</h2>
                 <form id="signup-form">
+                    <p style='color:red' id='message'></p>
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" required><br><br>
                     <label for="username">Username:</label>
@@ -120,8 +121,14 @@ document.addEventListener("DOMContentLoaded", function() {
                         sessionStorage.setItem('loginToken', 'true');
                         checkLoginStatus(); // Refresh the navbar and content
                     }
+                    else{
+                        document.getElementById('message').innerText=result.message;
+                    }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                });
             });
         }
 
@@ -150,6 +157,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     const changeClass = coin.change24hrpercentage >= 0 ? 'text-success' : 'text-danger';
                     coinrows += `
                         <tr>
+                        <td class="${changeClass}">${coin.name}</td>
+
                             <td class="${changeClass}">${coin.symbol}</td>
                             <td class="${changeClass}">$ ${coin.price.toFixed(2)}</td>
                             <td class="${changeClass}">${coin.change24hrpercentage.toFixed(2)}%</td>
@@ -163,6 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             <table class="table cointable">
                                 <thead>
                                     <tr>
+                                    <th scope="col">Name</th>
                                         <th scope="col">Symbol</th>
                                         <th scope="col">Price</th>
                                         <th scope="col">24hr Change</th>
@@ -257,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         function addCoinToPortfolio(coinSymbol, selectedPortfolioId) {
-            fetch(`http://127.0.0.1:5000/portfolio/add_coin/${selectedPortfolioId}/${coinSymbol}`, {
+            fetch(`http://127.0.0.1:5000/portfolio/add_coin/${selectedPortfolioId}/${coinSymbol}/1`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -308,8 +318,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         function loadHomePage() {
             const content = `
-            <h2>Company Name</h2>
-            <p>Welcome to our company!</p>
+            <h2>Elsa AI</h2>
+            <p>Welcome to your portfolio tracker!</p>
             <h3>Crypto Portfolio Tracker</h3>
             <p>A web application that allows users to track their cryptocurrency portfolio. The application fetches real-time cryptocurrency data, allowing users to add/remove coins to their portfolio, and display portfolio performance.</p>
         `;
@@ -363,14 +373,35 @@ document.addEventListener("DOMContentLoaded", function() {
                                     .then(data => {
                                         const { category,coins, portfolio } = data;
                                         let coinrows = '';
-        
+                                        let dailypnl=0;
+                                        let count=0;
+                                        let totalpercentage=0;
+                                        let totalamount=0;
+                                        let deltamount=0;
+                                        coins.forEach(coin => {
+                                            totalamount+=coin.price*coin.count
+                                            deltamount+= coin.price*coin.count *coin.change24hrpercentage/100
+
+                                        })
+                                        totalpercentage=deltamount/totalamount*100
+                                        deltamount=deltamount.toFixed(2);
+                                        totalpercentage=totalpercentage.toFixed(2);
+
+
+
                                         coins.forEach(coin => {
                                             const changeClass = coin.change24hrpercentage >= 0 ? 'text-success' : 'text-danger';
                                             coinrows += `
                                                 <tr>
+                                                    <td class="${changeClass}">${coin.name}</td>
                                                     <td class="${changeClass}">${coin.symbol}</td>
                                                     <td class="${changeClass}">$ ${coin.price.toFixed(2)}</td>
                                                     <td class="${changeClass}">${coin.change24hrpercentage.toFixed(2)}%</td>
+                                                    <td class="${changeClass}">
+                                                        <a class='removecoin' id='remove' data-symbol="${coin.symbol}">-</a>
+                                                        <a class='countnumber${coin.symbol}' id ='countnumber${coin.symbol}'>${coin.count}</a>
+                                                        <a id='add1' class='addcoin' data-symbol="${coin.symbol}">+</a>
+                                                    </td>
                                                     <td><span class="delete-coin-red" data-symbol="${coin.symbol}">Delete</span></td>
                                                 </tr>`;
                                         });
@@ -385,8 +416,8 @@ document.addEventListener("DOMContentLoaded", function() {
                                                         <thead>
                                                             <tr>
                                                                 <th scope="col" id='currentportfolio'>${portfolioId}</th>
-                                                                <th scope="col">Daily PnL: 23,000$</th>
-                                                                <th scope="col">Percentage: 3%</th>
+                                                                <th scope="col" id='dailypnl'>Daily PnL: procesing</th>
+                                                                <th scope="col" id='percentage'>Percentage: procesing</th>
                                                                 <th scope="col"><button class="btn btn-link text-success" onClick="loadDashboard()">Add coin +</button></th>
                                                             </tr>
                                                         </thead>
@@ -395,10 +426,11 @@ document.addEventListener("DOMContentLoaded", function() {
                                                     <table class="table cointable">
                                                         <thead>
                                                             <tr>
+                                                                <th scope="col">Name</th>
                                                                 <th scope="col">Symbol</th>
                                                                 <th scope="col">Price</th>
                                                                 <th scope="col">24hr Change</th>
-                                                                <th scope="col"></th>
+                                                                <th scope="col">Count</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>${coinrows}</tbody>
@@ -410,11 +442,125 @@ document.addEventListener("DOMContentLoaded", function() {
                                                 </div>
                                             </div>
                                         `;
+                                        document.getElementById('dailypnl').innerText='Daily PnL: '+deltamount.toString() +" $"
+                                        document.getElementById('percentage').innerText='Percentage PnL: '+totalpercentage.toString()+' %'
                                         document.querySelectorAll('.delete-coin-red').forEach(span => {
                                             span.addEventListener('click', function(event) {
                                                 const coinSymbol = this.getAttribute('data-symbol');
                                                 deleteCoinToPortfolio(portfolioId, coinSymbol);
                                             });
+                                        });
+                                        document.querySelectorAll('.removecoin').forEach(span => {
+                                            span.addEventListener('click', function(event) {
+                                                const coinsymbol = this.getAttribute('data-symbol');
+                                                removecoin(coinsymbol);
+                                            });
+                                        });
+                                        document.querySelectorAll('.addcoin').forEach(span => {
+                                            span.addEventListener('click', function(event) {
+                                                const coinsymbol = this.getAttribute('data-symbol');
+                                                addcoin(coinsymbol);    
+                                                                        item.addEventListener('click', function() {
+                                console.log(this.getAttribute('data-id'));
+                                const portfolioId = this.getAttribute('data-id');
+                                const portfolioDetails = document.getElementById('portfolio-details');
+                                portfolioDetails.style.display = 'block';
+                                fetch(`http://127.0.0.1:5000/portfolio/${portfolioId}/coins`, { credentials: 'include' })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const { category,coins, portfolio } = data;
+                                        let coinrows = '';
+                                        let dailypnl=0;
+                                        let count=0;
+                                        let totalpercentage=0;
+                                        let totalamount=0;
+                                        let deltamount=0;
+                                        coins.forEach(coin => {
+                                            totalamount+=coin.price*coin.count
+                                            deltamount+= coin.price*coin.count *coin.change24hrpercentage/100
+
+                                        })
+                                        totalpercentage=deltamount/totalamount*100
+                                        deltamount=deltamount.toFixed(2);
+                                        totalpercentage=totalpercentage.toFixed(2);
+
+
+
+                                        coins.forEach(coin => {
+                                            const changeClass = coin.change24hrpercentage >= 0 ? 'text-success' : 'text-danger';
+                                            coinrows += `
+                                                <tr>
+                                                    <td class="${changeClass}">${coin.name}</td>
+                                                    <td class="${changeClass}">${coin.symbol}</td>
+                                                    <td class="${changeClass}">$ ${coin.price.toFixed(2)}</td>
+                                                    <td class="${changeClass}">${coin.change24hrpercentage.toFixed(2)}%</td>
+                                                    <td class="${changeClass}">
+                                                        <a class='removecoin' id='remove' data-symbol="${coin.symbol}">-</a>
+                                                        <a class='countnumber${coin.symbol}' id ='countnumber${coin.symbol}'>${coin.count}</a>
+                                                        <a id='add1' class='addcoin' data-symbol="${coin.symbol}">+</a>
+                                                    </td>
+                                                    <td><span class="delete-coin-red" data-symbol="${coin.symbol}">Delete</span></td>
+                                                </tr>`;
+                                        });
+                                        
+                                        
+
+
+                                        portfolioDetails.innerHTML = `
+                                            <div class="container">
+                                                <div class="header">
+                                                    <table class="table headertable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col" id='currentportfolio'>${portfolioId}</th>
+                                                                <th scope="col" id='dailypnl'>Daily PnL: procesing</th>
+                                                                <th scope="col" id='percentage'>Percentage: procesing</th>
+                                                                <th scope="col"><button class="btn btn-link text-success" onClick="loadDashboard()">Add coin +</button></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                    <table class="table cointable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Symbol</th>
+                                                                <th scope="col">Price</th>
+                                                                <th scope="col">24hr Change</th>
+                                                                <th scope="col">Count</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>${coinrows}</tbody>
+                                                    </table>
+                                                    <div class="delete-port text-right">
+                                                                                        <button id="delete-portfolio-btn  btn btn-link" onClick="delete_portfolio_click()">Delete Portfolio</button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                        document.getElementById('dailypnl').innerText='Daily PnL: '+deltamount.toString() +" $"
+                                        document.getElementById('percentage').innerText='Percentage PnL: '+totalpercentage.toString()+' %'
+                                        document.querySelectorAll('.delete-coin-red').forEach(span => {
+                                            span.addEventListener('click', function(event) {
+                                                const coinSymbol = this.getAttribute('data-symbol');
+                                                deleteCoinToPortfolio(portfolioId, coinSymbol);
+                                            });
+                                        });
+                                        document.querySelectorAll('.removecoin').forEach(span => {
+                                            span.addEventListener('click', function(event) {
+                                                const coinsymbol = this.getAttribute('data-symbol');
+                                                removecoin(coinsymbol);
+                                            });
+                                        });
+                                        document.querySelectorAll('.addcoin').forEach(span => {
+                                            span.addEventListener('click', function(event) {
+                                                const coinsymbol = this.getAttribute('data-symbol');
+                                                addcoin(coinsymbol);                                            });
+                                        });
+                                    
+                                    });
+                            });                                        });
                                         });
                                     
                                     });
@@ -439,6 +585,52 @@ document.addEventListener("DOMContentLoaded", function() {
                 .catch(error => console.error('Error:', error));
         }
 
+
+        function removecoin(coinsymbol){
+            fetch('http://127.0.0.1:5000/user/remove_coin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ "symbol": coinsymbol, "quantity":1 }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                
+                if (data.status === 'success') {
+                    let mycount=Number(document.getElementById('countnumber'+data.symbol).innerText)
+                    document.getElementById('countnumber'+data.symbol).innerText=String(mycount-1)
+
+                    // then change the number from the frontend side
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            console.log("remove coin");
+        }
+        function addcoin(coinsymbol){
+            fetch('http://127.0.0.1:5000/user/add_coin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ "symbol": coinsymbol, "quantity":1 }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                
+                if (data.status === 'success') {
+                    let mycount=Number(document.getElementById('countnumber'+data.symbol).innerText)
+                    console.log('countnumber'+data.symbol)
+                    document.getElementById('countnumber'+data.symbol).innerText=String(mycount+1)
+
+                    // then change the number from the frontend side
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            console.log("remove coin");
+        }
 
         function logout() {
             fetch('http://127.0.0.1:5000/logout', { credentials: 'include' })
