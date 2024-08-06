@@ -41,4 +41,4 @@ SQL schemas will be created by the Flask ORM, which will update by using Flask M
 
 
 #Postman
-like to endpoint api documentation: 
+link to endpoint api documentation: https://documenter.getpostman.com/view/37286225/2sA3rxqZAT
