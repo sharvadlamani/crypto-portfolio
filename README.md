@@ -9,7 +9,7 @@
 #naviagte to folder that contains index.html : cd ../frontend
 #run the frontend: python3 -m http.server
 
-# Make sure to clcik name of portfolio again after changing # of each coin
+# Make sure to click name of portfolio again after changing # of each coin
 # Still need to update percentage (right now it assumes max of 1 coin per coin type)
 
 
@@ -41,4 +41,4 @@ SQL schemas will be created by the Flask ORM, which will update by using Flask M
 
 
 #Postman
-link to endpoint api documentation: https://documenter.getpostman.com/view/37286225/2sA3rxqZAT
+Link to endpoint API documentation: https://documenter.getpostman.com/view/37286225/2sA3rxqZAT
