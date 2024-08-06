@@ -1,15 +1,23 @@
 # crypto-portfolio
 
 # Instructions to run this project locally
+
 #git clone https://github.com/sharvadlamani/crypto-portfolio.git
+
 #cd into repo: cd crypto-portfolio
+
 #install the requirements: pip install -r requirements.txt
+
 #navigate to folder that contains run.py : cd backend
+
 #run the backend : flask run.py
+
 #naviagte to folder that contains index.html : cd ../frontend
+
 #run the frontend: python3 -m http.server
 
-# Make sure to click name of portfolio again after changing # of each coin
+# Make sure to click name of portfolio again to reload the page after changing the quantity of a coin 
+
 # Still need to update percentage (right now it assumes max of 1 coin per coin type)
 
 
