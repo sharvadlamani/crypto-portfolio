@@ -17,19 +17,24 @@
 # Structure of backend
 backend
  ┣ app
+ 
  ┃ ┣ auth.py
+ 
  ┃ ┣ coins.py
+ 
  ┃ ┣ config.py
+ 
  ┃ ┣ models.py
+ 
  ┃ ┣ portfolio.py
+ 
  ┃ ┣ views.py
+ 
  ┃ ┗ __init__.py
+ 
  ┣ migrations
+ 
  ┗ run.py
 
 #SQL Schema
 SQL schemas will be created by the Flask ORM, which will update by using Flask Migration when we update models.py
-
-
-#POSTMAN
-link to endpoint apis: 
