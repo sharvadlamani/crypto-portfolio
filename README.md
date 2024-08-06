@@ -17,14 +17,23 @@
 # Structure of backend
 backend
  ┣ app
+ 
  ┃ ┣ auth.py
+ 
  ┃ ┣ coins.py
+ 
  ┃ ┣ config.py
+ 
  ┃ ┣ models.py
+ 
  ┃ ┣ portfolio.py
+ 
  ┃ ┣ views.py
+ 
  ┃ ┗ __init__.py
+ 
  ┣ migrations
+ 
  ┗ run.py
 
 #SQL Schema
