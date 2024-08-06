@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .models import User , Portfolio, Coin
+from .models import User , Portfolio, Coin, coin_portfolio
 from . import db
 from flask_login import login_required
 from flask_login import current_user
@@ -77,11 +77,93 @@ def delete_portfolio(portfolioname):
     }), 200
 
 
+@portfolio_bp.route('/user/add_coin', methods=['POST'])
+@login_required
+def add_coin_to_user_route():
+    user_id=current_user.id 
+    data = request.json
+    coin_symbol = data.get('symbol')
+    quantity = data.get('quantity', 1)
+
+    coin = Coin.query.filter_by(symbol=coin_symbol).first()
+    if not coin:
+        return jsonify({'status': 'error', 'message': 'Coin not found'}), 404
+
+    result = add_coin_to_user(user_id, coin.coinid, quantity)
+    return jsonify(result)
+
+from .models import user_coin
+def add_coin_to_user(user_id, coin_id, quantity=1):
+    user = User.query.get(user_id)
+    if not user:
+        return {"status": "error", "message": "User not found"}
+    # Check if the association already exists
+    association = db.session.query(user_coin).filter_by(user_id=user_id, coin_id=coin_id).first()
+
+    if association:
+        # Update the quantity
+        stmt = user_coin.update().where(
+            user_coin.c.user_id == user_id and user_coin.c.coin_id == coin_id
+        ).values(quantity=association.quantity + quantity)
+        db.session.execute(stmt)
+    else:
+        # Insert new association
+        stmt = user_coin.insert().values(user_id=user_id, coin_id=coin_id, quantity=quantity)
+        db.session.execute(stmt)
+
+    db.session.commit()
+    print("coin_id")
+    symbol=Coin.query.filter_by(coinid=coin_id).first().symbol
+
+    return {"status": "success", "message": "Coin added to user successfully",'symbol':symbol}
+
+
+@portfolio_bp.route('/user/remove_coin', methods=['POST'])
+@login_required
+def remove_coin_to_user_route():
+    user_id=current_user.id 
+    data = request.json
+    coin_symbol = data.get('symbol')
+    quantity = data.get('quantity', 1)
+
+    coin = Coin.query.filter_by(symbol=coin_symbol).first()
+    if not coin:
+        return jsonify({'status': 'error', 'message': 'Coin not found'}), 404
+
+    result = remove_coin_to_user(user_id, coin.coinid, quantity)
+    return jsonify(result)
+
+from .models import user_coin
+def remove_coin_to_user(user_id, coin_id, quantity=1):
+    user = User.query.get(user_id)
+    if not user:
+        return {"status": "error", "message": "User not found"}
+
+    # Check if the association already exists
+    association = db.session.query(user_coin).filter_by(user_id=user_id, coin_id=coin_id).first()
+
+    if association:
+        if association.quantity<quantity:
+            return {"status": "error", "message": "cannot remove more than quantity"}
+        # Update the quantity
+        stmt = user_coin.update().where(
+            user_coin.c.user_id == user_id and user_coin.c.coin_id == coin_id
+        ).values(quantity=association.quantity - quantity)
+        db.session.execute(stmt)
+    else:
+        return {"status": "error", "message": "Failed to Coin removed to user"}
+
+    db.session.commit()
+    symbol=Coin.query.filter_by(coinid=coin_id).first().symbol
+
+    return {"status": "success", "message": "Coin removed to user successfully",'symbol':symbol}
+
+
 
 # add coins in portfolio
-@portfolio_bp.route('/portfolio/add_coin/<string:portfolioname>/<string:coin_symbol>', methods=['POST'])
+@portfolio_bp.route('/portfolio/add_coin/<string:portfolioname>/<string:coin_symbol>/<int:quantity>', methods=['POST'])
 @login_required
-def add_coin_to_portfolio(portfolioname, coin_symbol):
+def add_coin_to_portfolio(portfolioname, coin_symbol,quantity):
     portfolio = Portfolio.query.filter_by(title=portfolioname).first()
 
     if not portfolio:
@@ -104,7 +186,14 @@ def add_coin_to_portfolio(portfolioname, coin_symbol):
             "category": "error"
         }), 404
 
-    portfolio.coins.append(coin)
+    association = db.session.query(coin_portfolio).filter_by(coin_coinid=coin.coinid, portfolio_portfolioid=portfolio.portfolioid).first()
+    
+    if association:
+        association.count +=quantity
+    else:
+        insert = coin_portfolio.insert().values(coin_coinid=coin.coinid, portfolio_portfolioid=portfolio.portfolioid)
+        db.session.execute(insert)
+    
     db.session.commit()
 
     return jsonify({
@@ -147,6 +236,13 @@ def delete_coin_from_portfolio(portfolioname, coin_symbol):
         "category": "success"
     }), 200
 
+def get_coin_count_for_user(user_id, coin_id):
+    result = db.session.query(user_coin).filter_by(user_id=user_id, coin_id=coin_id).first()
+    if result:
+        return result.quantity
+    else:
+        return 0  # Return 0 if the coin is not found in the user's portfolio
+    
 
 #get all portfolio coins
 @portfolio_bp.route('/portfolio/<string:portfolioname>/coins', methods=['GET'])
@@ -168,12 +264,15 @@ def get_all_coins_in_portfolio(portfolioname):
 
     coins = portfolio.coins
     coins_list = []
+
     for coin in coins:
         coins_list.append({
             "name": coin.name,
+            "coinid":coin.coinid,
             "symbol": coin.symbol,
             "price": coin.price,
-            "change24hrpercentage": coin.change24hrpercentage
+            "change24hrpercentage": coin.change24hrpercentage,
+            "count": get_coin_count_for_user(current_user.id,coin.coinid)
         })
 
     return jsonify({
@@ -186,5 +285,5 @@ def get_all_coins_in_portfolio(portfolioname):
 @login_required
 def all_coins():
     coins = Coin.query.all()
-    coin_list = [{'id': coin.id, 'name': coin.name, 'symbol': coin.symbol, 'price': coin.price,"change24hrpercentage": coin.change24hrpercentage} for coin in coins]
+    coin_list = [{'id': coin.coinid, 'name': coin.name, 'symbol': coin.symbol, 'price': coin.price,"change24hrpercentage": coin.change24hrpercentage} for coin in coins]
     return jsonify(coin_list), 200
