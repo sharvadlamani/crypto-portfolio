@@ -12,7 +12,7 @@
 
 #run the backend : flask run.py
 
-#naviagte to folder that contains index.html : cd ../frontend
+navigate to folder that contains index.html : cd ../frontend
 
 #run the frontend: python3 -m http.server
 
