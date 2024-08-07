@@ -24,6 +24,7 @@ navigate to folder that contains index.html : cd ../frontend
 
 # Structure of backend
 backend
+
  ┣ app
  
  ┃ ┣ auth.py
