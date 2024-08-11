@@ -1,3 +1,6 @@
+let ipaddress='3.135.161.167'
+let backendport='8080'
+let url=ipaddress+':'+backendport
 document.addEventListener("DOMContentLoaded", function() {
     loadHomePage();
     checkLoginStatus();
@@ -5,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
         function checkLoginStatus() {
             const token = sessionStorage.getItem('loginToken');
             if (token) {
-                fetch('http://127.0.0.1:5000/isloggedin', {
+                fetch('http://3.135.161.167:8080/isloggedin', {
                     method: 'GET',
                     credentials: 'include'
                 })
@@ -61,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
 
-                fetch('http://127.0.0.1:5000/login', {
+                fetch('http://3.135.161.167:8080/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -106,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const password1 = document.getElementById('password1').value;
                 const password2 = document.getElementById('password2').value;
 
-                fetch('http://127.0.0.1:5000/sign-up', {
+                fetch('http://3.135.161.167:8080/sign-up', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -144,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
             `;
             document.getElementById('main-content').innerHTML = content+`<div id='cointabler'></div>`;
-            fetch(`http://127.0.0.1:5000/coins/all`, { credentials: 'include' })
+            fetch(`http://3.135.161.167:8080/coins/all`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 const coins = data;
@@ -198,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         function showPortfolioDropdown(element, coinSymbol) {
-            fetch('http://127.0.0.1:5000/portfolio/viewall', { credentials: 'include' })
+            fetch('http://3.135.161.167:8080/portfolio/viewall', { credentials: 'include' })
                 .then(response => response.json())
                 .then(data => {
                     const [result, status] = data;
@@ -267,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         function addCoinToPortfolio(coinSymbol, selectedPortfolioId) {
-            fetch(`http://127.0.0.1:5000/portfolio/add_coin/${selectedPortfolioId}/${coinSymbol}/1`, {
+            fetch(`http://3.135.161.167:8080/portfolio/add_coin/${selectedPortfolioId}/${coinSymbol}/1`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -326,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('main-content').innerHTML = content;
         }
         function deleteCoinToPortfolio(selectedPortfolioId,coinSymbol ) {
-            fetch(`http://127.0.0.1:5000/portfolio/delete_coin/${selectedPortfolioId}/${coinSymbol}`, {
+            fetch(`http://3.135.161.167:8080/portfolio/delete_coin/${selectedPortfolioId}/${coinSymbol}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -347,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         function loadUserPortfolios() {
-            fetch('http://127.0.0.1:5000/portfolio/viewall', { credentials: 'include' })
+            fetch('http://3.135.161.167:8080/portfolio/viewall', { credentials: 'include' })
                 .then(response => response.json())
                 .then(data => {
                     const [result, status] = data;
@@ -368,7 +371,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 const portfolioId = this.getAttribute('data-id');
                                 const portfolioDetails = document.getElementById('portfolio-details');
                                 portfolioDetails.style.display = 'block';
-                                fetch(`http://127.0.0.1:5000/portfolio/${portfolioId}/coins`, { credentials: 'include' })
+                                fetch(`http://3.135.161.167:8080/portfolio/${portfolioId}/coins`, { credentials: 'include' })
                                     .then(response => response.json())
                                     .then(data => {
                                         const { category,coins, portfolio } = data;
@@ -465,7 +468,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 const portfolioId = this.getAttribute('data-id');
                                 const portfolioDetails = document.getElementById('portfolio-details');
                                 portfolioDetails.style.display = 'block';
-                                fetch(`http://127.0.0.1:5000/portfolio/${portfolioId}/coins`, { credentials: 'include' })
+                                fetch(`http://3.135.161.167:8080/portfolio/${portfolioId}/coins`, { credentials: 'include' })
                                     .then(response => response.json())
                                     .then(data => {
                                         const { category,coins, portfolio } = data;
@@ -587,7 +590,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         function removecoin(coinsymbol){
-            fetch('http://127.0.0.1:5000/user/remove_coin', {
+            fetch('http://3.135.161.167:8080/user/remove_coin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -609,7 +612,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("remove coin");
         }
         function addcoin(coinsymbol){
-            fetch('http://127.0.0.1:5000/user/add_coin', {
+            fetch('http://3.135.161.167:8080/user/add_coin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -633,7 +636,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         function logout() {
-            fetch('http://127.0.0.1:5000/logout', { credentials: 'include' })
+            fetch('http://3.135.161.167:8080/logout', { credentials: 'include' })
                 .then(response => response.json())
                 .then(data => {
                     const [result, status] = data;
@@ -653,7 +656,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("delete ",portfolioName)
             if (portfolioName) {
                 // Fetch request to create a new portfolio
-                fetch(`http://127.0.0.1:5000/portfolio/delete/${portfolioName}`, {
+                fetch(`http://3.135.161.167:8080/portfolio/delete/${portfolioName}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 })
@@ -677,7 +680,7 @@ document.addEventListener("DOMContentLoaded", function() {
            const portfolioName = document.getElementById('portfolio-name').value;
            if (portfolioName) {
                // Fetch request to create a new portfolio
-               fetch(`http://127.0.0.1:5000/portfolio/create/${portfolioName}`, {
+               fetch(`http://3.135.161.167:8080/portfolio/create/${portfolioName}`, {
                    method: 'GET',
                    credentials: 'include'
                })
