@@ -63,7 +63,6 @@ def create_app():
         coins_data = get_crypto_details()
 
         if not coins_data:
-            print("No coin data available.")
             return
         
         for coin in coins_data:
@@ -75,7 +74,6 @@ def create_app():
                 existing_coin.change24hrpercentage=coin['change24hrpercentage']
 
                 db.session.commit()
-        print("Coin details updated.")
 
     def update_coin():
         with app.app_context():

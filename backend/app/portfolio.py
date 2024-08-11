@@ -112,7 +112,6 @@ def add_coin_to_user(user_id, coin_id, quantity=1):
         db.session.execute(stmt)
 
     db.session.commit()
-    print("coin_id")
     symbol=Coin.query.filter_by(coinid=coin_id).first().symbol
 
     return {"status": "success", "message": "Coin added to user successfully",'symbol':symbol}
